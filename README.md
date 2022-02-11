@@ -1,7 +1,8 @@
 # CICD with Jenkins and AWS
 # CICD_jenkins_aws
 
-![My project (10)](https://user-images.githubusercontent.com/98178943/153622078-f8f91b07-a509-4867-befa-0e4596ce3dfd.png)
+![My project (11)](https://user-images.githubusercontent.com/98178943/153639945-52662638-4ad1-46dc-8af4-55826c368a53.png)
+
 
 
 # Create a SSH connection from localhost to GitHub
