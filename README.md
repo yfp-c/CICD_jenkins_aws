@@ -3,7 +3,9 @@
 
 ![My project (11)](https://user-images.githubusercontent.com/98178943/153639945-52662638-4ad1-46dc-8af4-55826c368a53.png)
 
+### Note: Before we start cloning repos if we get permission denied, we can enter the commands below to fix it:
 
+<img src="https://user-images.githubusercontent.com/98178943/153861943-9236b5f2-712e-4245-894f-2942ba86d5d0.png" width="250">
 
 # Create a SSH connection from localhost to GitHub
 
