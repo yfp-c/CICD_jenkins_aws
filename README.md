@@ -79,3 +79,87 @@ Select `console output` under the build number and you'll see a separate page sa
 Click on test_2 and click on it's `console output` and you'll see that the `ps aux` command was successfully executed:
 
 <img src="https://user-images.githubusercontent.com/98178943/153609418-626854dc-104f-4176-b647-6162f3b8b779.png" width="500">
+
+# Setting up Jenkins to create a CI/CD pipeline
+
+## Generate a new key of cloned repo you want to push
+-----
+- `ssh-keygen -t rsa -b 4096 -C "email@email.com"`
+- enter `eval "$(ssh-agent -s)"` and `ssh-add ~/.ssh/103a` to give yourself permissions to commit the cloned repo.
+
+- do `cat yourkey.pub` to obtain the public key which we'll put on github.
+
+## Copying the key to github
+----
+- Enter your cloned repo, select the settings tab INSIDE the repo.
+- Deploy keys > Add deploy key
+- Copy the public key you copied and enter it into the key field, with an appropriate title. 
+
+## Connecting the repo to Jenkins
+------
+{Awaiting screenshot but AWS hosting jenkins is down...} 
+
+## Setting up webhook
+- Go to the settings tab in your cloned repo on github > create new github
+- Enter the payload url of your jenkins server. E.g. `69.594.384.22:8080/github-webhook/
+- Content type `application/json`
+- Leave secret blank
+- `Send me everything` for events triggered
+
+
+## Creating three jenkins jobs to create the CI/CD pipeline. 
+
+### First job to pull and push dev builds
+- Create new item
+- Discard old builds, set 3 for max builds to keep
+- Select GitHub project, enter the HTTP link to your repo
+- Under `office 365 connector`, select `Restrict where this project can be run` and type `sparta-ubuntu-node` as we want to run it from this node. 
+- Under `source code management` select the `git` option.
+- Enter your SSH repository link under `Repository URL`
+- Under credentials, we need to add the private SSH key, we can obtain the private key from our terminal. Paste that under credentials by adding a new key
+- Under `Branches to build` enter `*/dev` as we want to push the dev builds
+- Under `Build Triggers` select `GitHub hook trigger for GITScm polling`, this is to ensure that jenkins is notified from the webhook.
+- Under `Build Environment` select `Provide Node & npm bin/folder to PATH`
+- - Select `Add post-build action` and click `Build other projects`, enter the name of your second job (once you have made it)
+
+## Second job to merge dev branch to main branch
+-----------
+- Create new item
+- Discard old builds, set 3 for max builds to keep
+- Select GitHub project, enter the HTTP link to your repo
+- Under `office 365 connector`, select `Restrict where this project can be run` and type `sparta-ubuntu-node` as we want to run it from this node. 
+- Under `source code management` select the `git` option.
+- Enter your SSH repository link under `Repository URL`
+- Under credentials, we can enter the SSH private key that we already have.
+- Under `Build Environment` select `Provide Node & npm bin/folder to PATH`
+- Under `Branches to build` enter `*/dev`, we will push to main branch in the next few steps.
+- Under the build option, select `Execute Shell` and enter:
+```
+git checkout main
+git merge origin/dev
+```
+### Post-build actions
+- Select `Add post-build action` > `Git Publisher`
+- Click `Push Only If Build Succeeds` - this action self-explanatory
+- Select `Add post-build action` again and click `Build other projects`, enter the name of your third job (once you have made it)
+- Ensure that `Trigger only if build is stable` is selected.
+
+## Creating EC2 instance in AWS
+- A very straightforward process, from the VPCs and its containers, create a new instance, ensuring the ports and inbound rules are open for your own IP and for the jenkins ip.
+
+## Creating the third job
+- Create new item
+- Discard old builds, set 3 for max builds to keep
+- Select GitHub project, enter the HTTP link to your repo
+- Under `office 365 connector`, select `Restrict where this project can be run` and type `sparta-ubuntu-node` as we want to run it from this node. 
+- Under `source code management` select the `git` option.
+- Enter your SSH repository link under `Repository URL`
+- Under credentials, we can enter the SSH private key that we already have.
+- Under `Build Environment` select `Provide Node & npm bin/folder to PATH`
+- Under `Branches to build` enter `*/main`
+- Enter your file.pem to be able to enter the EC2 instance
+- Under `build`, we can enter:
+
+```
+scp -o "StrictHostKeyChecking=no" -r app ubuntu@IPfromaws:~
+```
