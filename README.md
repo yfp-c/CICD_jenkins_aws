@@ -346,3 +346,10 @@ For job 3, enter the ip of your instance where you want to host your app.
 ## Testing your pipeline
 
 I have written this readme alongside creating the pipeline from scratch so it should work once you push a change from your localhost > repo > jenkins > deployed to AWS.
+
+
+Sources:
+
+https://pkg.jenkins.io/debian-stable/
+
+https://www.kisphp.com/linux/setup-jenkins-server-on-aws-ec2-with-slave-agents
